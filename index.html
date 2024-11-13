@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Player with Volume Control</title>
-    <link rel="manifest" href="manifest.json">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,6 +42,87 @@
         <input type="range" id="volume-slider2" class="volume-slider" min="0" max="100" value="100">
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const player1 = document.getElementById('player1');
+            const player2 = document.getElementById('player2');
+            const volumeSlider1 = document.getElementById('volume-slider1');
+            const volumeSlider2 = document.getElementById('volume-slider2');
+
+            let isPlaying1 = false;
+            let isPlaying2 = false;
+
+            // Set initial volume
+            player1.volume = volumeSlider1.value / 100;
+            player2.volume = volumeSlider2.value / 100;
+
+            // Volume control for player 1
+            volumeSlider1.addEventListener('input', () => {
+                player1.volume = volumeSlider1.value / 100;
+            });
+
+            // Volume control for player 2
+            volumeSlider2.addEventListener('input', () => {
+                player2.volume = volumeSlider2.value / 100;
+            });
+
+            // Autoplay the audio
+            player1.autoplay = true;
+            player2.autoplay = true;
+
+            // Loop the audio if necessary
+            player1.loop = true;
+            player2.loop = true;
+
+            // Handle visibilitychange event
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) {
+                    // Ensure audio continues to play when the app is brought back to the foreground
+                    if (isPlaying1) player1.play();
+                    if (isPlaying2) player2.play();
+                }
+            });
+
+            // Play and pause audio based on user interaction (Safari requires user input to play)
+            player1.addEventListener('play', () => {
+                isPlaying1 = true;
+            });
+            player1.addEventListener('pause', () => {
+                isPlaying1 = false;
+            });
+
+            player2.addEventListener('play', () => {
+                isPlaying2 = true;
+            });
+            player2.addEventListener('pause', () => {
+                isPlaying2 = false;
+            });
+
+            // Function to handle play on page load or after user input
+            function startAudio() {
+                if (!isPlaying1) {
+                    player1.play();
+                }
+                if (!isPlaying2) {
+                    player2.play();
+                }
+            }
+
+            // Ensure the audio starts when the user interacts with the page
+            document.body.addEventListener('click', startAudio);
+
+            // Ensure the audio continues playing when the screen is off or backgrounded (iOS limitation)
+            // Workaround using the visibilitychange event and auto-play functionality
+            if (document.hidden) {
+                // Pause audio when the app goes to the background (works in most cases)
+                player1.pause();
+                player2.pause();
+            } else {
+                // Resume audio when the app comes back to the foreground
+                if (isPlaying1) player1.play();
+                if (isPlaying2) player2.play();
+            }
+        });
+    </script>
 </body>
 </html>
