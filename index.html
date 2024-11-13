@@ -1,1 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dual Audio Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .player-section {
+      margin-bottom: 20px;
+    }
+    .slider {
+      width: 100%;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
 
+<div class="container">
+  <h1>Dual Audio Player</h1>
+
+  <!-- Player 1 -->
+  <div class="player-section">
+    <h2>Player 1</h2>
+    <input type="file" accept="audio/*" id="audioFile1" onchange="loadAudio(1)">
+    <div class="controls">
+      <button onclick="togglePlayPause(1)" id="playPauseBtn1">Play</button>
+      <input type="range" id="progressSlider1" class="slider" min="0" max="1" step="0.1" value="0" onchange="seekAudio(1)">
+      <span id="currentTime1">0:00</span> / <span id="duration1">0:00</span>
+    </div>
+    <input type="range" id="volumeSlider1" class="slider" min="0" max="1" step="0.1" value="0.5" onchange="setVolume(1)">
+  </div>
+
+  <!-- Player 2 -->
+  <div class="player-section">
+    <h2>Player 2</h2>
+    <input type="file" accept="audio/*" id="audioFile2" onchange="loadAudio(2)">
+    <div class="controls">
+      <button onclick="togglePlayPause(2)" id="playPauseBtn2">Play</button>
+      <input type="range" id="progressSlider2" class="slider" min="0" max="1" step="0.1" value="0" onchange="seekAudio(2)">
+      <span id="currentTime2">0:00</span> / <span id="duration2">0:00</span>
+    </div>
+    <input type="range" id="volumeSlider2" class="slider" min="0" max="1" step="0.1" value="0.5" onchange="setVolume(2)">
+  </div>
+</div>
+
+<script>
+  let player1 = null;
+  let player2 = null;
+  let isPlaying1 = false;
+  let isPlaying2 = false;
+
+  // Load Audio
+  function loadAudio(playerNumber) {
+    const fileInput = document.getElementById(`audioFile${playerNumber}`);
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const audioUrl = URL.createObjectURL(file);
+    if (playerNumber === 1) {
+      player1 = new Audio(audioUrl);
+      player1.addEventListener('loadedmetadata', () => setupPlayer(player1, 1));
+      player1.addEventListener('timeupdate', () => updateProgress(1));
+    } else {
+      player2 = new Audio(audioUrl);
+      player2.addEventListener('loadedmetadata', () => setupPlayer(player2, 2));
+      player2.addEventListener('timeupdate', () => updateProgress(2));
+    }
+  }
+
+  // Setup Player
+  function setupPlayer(player, playerNumber) {
+    const duration = formatTime(player.duration);
+    document.getElementById(`duration${playerNumber}`).textContent = duration;
+    document.getElementById(`progressSlider${playerNumber}`).max = player.duration;
+  }
+
+  // Toggle Play/Pause
+  function togglePlayPause(playerNumber) {
+    const player = playerNumber === 1 ? player1 : player2;
+    const isPlaying = playerNumber === 1 ? isPlaying1 : isPlaying2;
+    if (!player) return;
+
+    if (isPlaying) {
+      player.pause();
+      document.getElementById(`playPauseBtn${playerNumber}`).textContent = 'Play';
+      if (playerNumber === 1) isPlaying1 = false;
+      else isPlaying2 = false;
+    } else {
+      player.play();
+      document.getElementById(`playPauseBtn${playerNumber}`).textContent = 'Pause';
+      if (playerNumber === 1) isPlaying1 = true;
+      else isPlaying2 = true;
+    }
+  }
+
+  // Update Progress
+  function updateProgress(playerNumber) {
+    const player = playerNumber === 1 ? player1 : player2;
+    const currentTime = player.currentTime;
+    document.getElementById(`progressSlider${playerNumber}`).value = currentTime;
+    document.getElementById(`currentTime${playerNumber}`).textContent = formatTime(currentTime);
+  }
+
+  // Seek Audio
+  function seekAudio(playerNumber) {
+    const player = playerNumber === 1 ? player1 : player2;
+    const slider = document.getElementById(`progressSlider${playerNumber}`);
+    if (player) player.currentTime = slider.value;
+  }
+
+  // Set Volume
+  function setVolume(playerNumber) {
+    const player = playerNumber === 1 ? player1 : player2;
+    const volume = document.getElementById(`volumeSlider${playerNumber}`).value;
+    if (player) player.volume = volume;
+  }
+
+  // Format Time Helper
+  function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+</script>
+
+</body>
+</html>
