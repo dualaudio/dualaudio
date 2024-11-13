@@ -1,146 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Player with Volume Control</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .audio-container {
-            margin-top: 20px;
-        }
-        .volume-slider {
-            width: 200px;
-            margin-top: 10px;
-        }
-        #player1, #player2 {
-            width: 100%;
-        }
-        .file-input {
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Player with Gain Control</title>
 </head>
 <body>
-    <h1>Audio Player with Individual Volume Control</h1>
 
-    <!-- Audio Player 1 -->
-    <div class="audio-container">
-        <h2>Audio Player 1</h2>
-        <audio id="player1" controls>
-            <source id="audio1" src="" type="audio/mp3">
-            Your browser does not support the audio element.
-        </audio>
-        <input type="range" id="volume-slider1" class="volume-slider" min="0" max="100" value="100">
-        <br>
-        <input type="file" id="file1" class="file-input" accept="audio/*">
-    </div>
+<h1>Independent Volume Audio Player</h1>
 
-    <!-- Audio Player 2 -->
-    <div class="audio-container">
-        <h2>Audio Player 2</h2>
-        <audio id="player2" controls>
-            <source id="audio2" src="" type="audio/mp3">
-            Your browser does not support the audio element.
-        </audio>
-        <input type="range" id="volume-slider2" class="volume-slider" min="0" max="100" value="100">
-        <br>
-        <input type="file" id="file2" class="file-input" accept="audio/*">
-    </div>
+<!-- Player 1 -->
+<div>
+  <h2>Player 1</h2>
+  <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile1" onchange="loadAudio(1)">
+  <button onclick="togglePlayPause(1)" id="playPauseBtn1">Play</button>
+  <input type="range" id="volumeSlider1" min="0" max="1" step="0.1" value="0.5" onchange="setVolume(1)">
+  <label for="volumeSlider1">Volume</label>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const player1 = document.getElementById('player1');
-            const player2 = document.getElementById('player2');
-            const volumeSlider1 = document.getElementById('volume-slider1');
-            const volumeSlider2 = document.getElementById('volume-slider2');
-            const fileInput1 = document.getElementById('file1');
-            const fileInput2 = document.getElementById('file2');
+<!-- Player 2 -->
+<div>
+  <h2>Player 2</h2>
+  <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile2" onchange="loadAudio(2)">
+  <button onclick="togglePlayPause(2)" id="playPauseBtn2">Play</button>
+  <input type="range" id="volumeSlider2" min="0" max="1" step="0.1" value="0.5" onchange="setVolume(2)">
+  <label for="volumeSlider2">Volume</label>
+</div>
 
-            let isPlaying1 = false;
-            let isPlaying2 = false;
+<script>
+  // Audio context and gain nodes
+  const audioContext1 = new (window.AudioContext || window.webkitAudioContext)();
+  const gainNode1 = audioContext1.createGain();
+  gainNode1.connect(audioContext1.destination);
 
-            // Set initial volume
-            player1.volume = volumeSlider1.value / 100;
-            player2.volume = volumeSlider2.value / 100;
+  const audioContext2 = new (window.AudioContext || window.webkitAudioContext)();
+  const gainNode2 = audioContext2.createGain();
+  gainNode2.connect(audioContext2.destination);
 
-            // Volume control for player 1
-            volumeSlider1.addEventListener('input', () => {
-                player1.volume = volumeSlider1.value / 100;
-            });
+  // Variables to store audio elements and their states
+  let player1 = null;
+  let player2 = null;
+  let isPlaying1 = false;
+  let isPlaying2 = false;
 
-            // Volume control for player 2
-            volumeSlider2.addEventListener('input', () => {
-                player2.volume = volumeSlider2.value / 100;
-            });
+  // Load Audio File for Player
+  function loadAudio(playerNumber) {
+    const fileInput = document.getElementById(`audioFile${playerNumber}`);
+    const file = fileInput.files[0];
+    if (!file) return;
 
-            // File input for player 1
-            fileInput1.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const audioURL = URL.createObjectURL(file);
-                    player1.src = audioURL;
-                    player1.load();  // Reload the audio player with the new file
-                    player1.play();
-                    isPlaying1 = true;
-                }
-            });
+    const audioUrl = URL.createObjectURL(file);
+    
+    if (playerNumber === 1) {
+      if (player1) player1.disconnect();
+      player1 = new Audio(audioUrl);
+      const track = audioContext1.createMediaElementSource(player1);
+      track.connect(gainNode1);
+      isPlaying1 = false;
+      document.getElementById("playPauseBtn1").textContent = "Play";
+    } else if (playerNumber === 2) {
+      if (player2) player2.disconnect();
+      player2 = new Audio(audioUrl);
+      const track = audioContext2.createMediaElementSource(player2);
+      track.connect(gainNode2);
+      isPlaying2 = false;
+      document.getElementById("playPauseBtn2").textContent = "Play";
+    }
+  }
 
-            // File input for player 2
-            fileInput2.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const audioURL = URL.createObjectURL(file);
-                    player2.src = audioURL;
-                    player2.load();  // Reload the audio player with the new file
-                    player2.play();
-                    isPlaying2 = true;
-                }
-            });
+  // Toggle Play/Pause for Audio Player
+  function togglePlayPause(playerNumber) {
+    if (playerNumber === 1 && player1) {
+      if (isPlaying1) {
+        player1.pause();
+        document.getElementById("playPauseBtn1").textContent = "Play";
+      } else {
+        player1.play();
+        audioContext1.resume(); // Resume context if suspended
+        document.getElementById("playPauseBtn1").textContent = "Pause";
+      }
+      isPlaying1 = !isPlaying1;
+    } else if (playerNumber === 2 && player2) {
+      if (isPlaying2) {
+        player2.pause();
+        document.getElementById("playPauseBtn2").textContent = "Play";
+      } else {
+        player2.play();
+        audioContext2.resume(); // Resume context if suspended
+        document.getElementById("playPauseBtn2").textContent = "Pause";
+      }
+      isPlaying2 = !isPlaying2;
+    }
+  }
 
-            // Handle play and pause audio based on user interaction (Safari requires user input to play)
-            player1.addEventListener('play', () => {
-                isPlaying1 = true;
-            });
-            player1.addEventListener('pause', () => {
-                isPlaying1 = false;
-            });
+  // Set Volume for Audio Player
+  function setVolume(playerNumber) {
+    const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
+    if (playerNumber === 1) {
+      gainNode1.gain.value = volume;
+    } else if (playerNumber === 2) {
+      gainNode2.gain.value = volume;
+    }
+  }
+</script>
 
-            player2.addEventListener('play', () => {
-                isPlaying2 = true;
-            });
-            player2.addEventListener('pause', () => {
-                isPlaying2 = false;
-            });
-
-            // Function to handle play on page load or after user input
-            function startAudio() {
-                if (!isPlaying1) {
-                    player1.play();
-                }
-                if (!isPlaying2) {
-                    player2.play();
-                }
-            }
-
-            // Ensure the audio starts when the user interacts with the page
-            document.body.addEventListener('click', startAudio);
-
-            // Ensure the audio continues playing when the screen is off or backgrounded (iOS limitation)
-            // Workaround using the visibilitychange event and auto-play functionality
-            if (document.hidden) {
-                // Pause audio when the app goes to the background (works in most cases)
-                player1.pause();
-                player2.pause();
-            } else {
-                // Resume audio when the app comes back to the foreground
-                if (isPlaying1) player1.play();
-                if (isPlaying2) player2.play();
-            }
-        });
-    </script>
 </body>
 </html>
