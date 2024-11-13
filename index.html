@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audio Player with Independent Volume Control</title>
+  <title>Audio Player with Gain Control</title>
 </head>
 <body>
 
@@ -28,7 +28,16 @@
 </div>
 
 <script>
-  // Variables to store audio players and their states
+  // Audio context and gain nodes
+  const audioContext1 = new (window.AudioContext || window.webkitAudioContext)();
+  const gainNode1 = audioContext1.createGain();
+  gainNode1.connect(audioContext1.destination);
+
+  const audioContext2 = new (window.AudioContext || window.webkitAudioContext)();
+  const gainNode2 = audioContext2.createGain();
+  gainNode2.connect(audioContext2.destination);
+
+  // Variables to store audio elements and their states
   let player1 = null;
   let player2 = null;
   let isPlaying1 = false;
@@ -43,15 +52,17 @@
     const audioUrl = URL.createObjectURL(file);
     
     if (playerNumber === 1) {
-      if (player1) player1.pause();
+      if (player1) player1.disconnect();
       player1 = new Audio(audioUrl);
-      player1.volume = parseFloat(document.getElementById(`volumeSlider1`).value);
+      const track = audioContext1.createMediaElementSource(player1);
+      track.connect(gainNode1);
       isPlaying1 = false;
       document.getElementById("playPauseBtn1").textContent = "Play";
     } else if (playerNumber === 2) {
-      if (player2) player2.pause();
+      if (player2) player2.disconnect();
       player2 = new Audio(audioUrl);
-      player2.volume = parseFloat(document.getElementById(`volumeSlider2`).value);
+      const track = audioContext2.createMediaElementSource(player2);
+      track.connect(gainNode2);
       isPlaying2 = false;
       document.getElementById("playPauseBtn2").textContent = "Play";
     }
@@ -65,6 +76,7 @@
         document.getElementById("playPauseBtn1").textContent = "Play";
       } else {
         player1.play();
+        audioContext1.resume(); // Resume context if suspended
         document.getElementById("playPauseBtn1").textContent = "Pause";
       }
       isPlaying1 = !isPlaying1;
@@ -74,27 +86,22 @@
         document.getElementById("playPauseBtn2").textContent = "Play";
       } else {
         player2.play();
+        audioContext2.resume(); // Resume context if suspended
         document.getElementById("playPauseBtn2").textContent = "Pause";
       }
       isPlaying2 = !isPlaying2;
     }
   }
 
+  // Set Volume for Audio Player
   function setVolume(playerNumber) {
-  const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
-  const volumeDisplay = document.getElementById(`volumeSlider${playerNumber}`).nextElementSibling;  // Get the element after the slider
-  if (playerNumber === 1 && player1) {
-    player1.volume = volume;
-    if (volumeDisplay) {
-      volumeDisplay.textContent = `Volume: ${volume}`;  // Update volume display
-    }
-  } else if (playerNumber === 2 && player2) {
-    player2.volume = volume;
-    if (volumeDisplay) {
-      volumeDisplay.textContent = `Volume: ${volume}`;
+    const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
+    if (playerNumber === 1) {
+      gainNode1.gain.value = volume;
+    } else if (playerNumber === 2) {
+      gainNode2.gain.value = volume;
     }
   }
-}
 </script>
 
 </body>
