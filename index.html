@@ -80,15 +80,21 @@
     }
   }
 
-  // Set Volume for Audio Player
   function setVolume(playerNumber) {
-    const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
-    if (playerNumber === 1 && player1) {
-      player1.volume = volume;
-    } else if (playerNumber === 2 && player2) {
-      player2.volume = volume;
+  const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
+  const volumeDisplay = document.getElementById(`volumeSlider${playerNumber}`).nextElementSibling;  // Get the element after the slider
+  if (playerNumber === 1 && player1) {
+    player1.volume = volume;
+    if (volumeDisplay) {
+      volumeDisplay.textContent = `Volume: ${volume}`;  // Update volume display
+    }
+  } else if (playerNumber === 2 && player2) {
+    player2.volume = volume;
+    if (volumeDisplay) {
+      volumeDisplay.textContent = `Volume: ${volume}`;
     }
   }
+}
 </script>
 
 </body>
