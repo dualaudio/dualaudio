@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi Audio Player</title>
+  <title>Audio Player with Independent Volume Control</title>
 </head>
 <body>
 
-<h1>Dual Audio Player</h1>
+<h1>Independent Volume Audio Player</h1>
 
 <!-- Player 1 -->
 <div>
@@ -43,17 +43,15 @@
     const audioUrl = URL.createObjectURL(file);
     
     if (playerNumber === 1) {
-      // Stop and reset player if already loaded
       if (player1) player1.pause();
       player1 = new Audio(audioUrl);
-      player1.volume = document.getElementById(`volumeSlider1`).value;
+      player1.volume = parseFloat(document.getElementById(`volumeSlider1`).value);
       isPlaying1 = false;
       document.getElementById("playPauseBtn1").textContent = "Play";
     } else if (playerNumber === 2) {
-      // Stop and reset player if already loaded
       if (player2) player2.pause();
       player2 = new Audio(audioUrl);
-      player2.volume = document.getElementById(`volumeSlider2`).value;
+      player2.volume = parseFloat(document.getElementById(`volumeSlider2`).value);
       isPlaying2 = false;
       document.getElementById("playPauseBtn2").textContent = "Play";
     }
@@ -84,11 +82,10 @@
 
   // Set Volume for Audio Player
   function setVolume(playerNumber) {
+    const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
     if (playerNumber === 1 && player1) {
-      const volume = document.getElementById("volumeSlider1").value;
       player1.volume = volume;
     } else if (playerNumber === 2 && player2) {
-      const volume = document.getElementById("volumeSlider2").value;
       player2.volume = volume;
     }
   }
