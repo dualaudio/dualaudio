@@ -3,58 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audio Player</title>
+  <title>Multi Audio Player</title>
 </head>
 <body>
 
-<h1>Audio Player Test</h1>
+<h1>Dual Audio Player</h1>
 
 <!-- Player 1 -->
 <div>
   <h2>Player 1</h2>
-  <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg" id="audioFile1" onchange="loadAudio(1)">
+  <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile1" onchange="loadAudio(1)">
   <button onclick="togglePlayPause(1)" id="playPauseBtn1">Play</button>
   <input type="range" id="volumeSlider1" min="0" max="1" step="0.1" value="0.5" onchange="setVolume(1)">
+  <label for="volumeSlider1">Volume</label>
+</div>
+
+<!-- Player 2 -->
+<div>
+  <h2>Player 2</h2>
+  <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile2" onchange="loadAudio(2)">
+  <button onclick="togglePlayPause(2)" id="playPauseBtn2">Play</button>
+  <input type="range" id="volumeSlider2" min="0" max="1" step="0.1" value="0.5" onchange="setVolume(2)">
+  <label for="volumeSlider2">Volume</label>
 </div>
 
 <script>
+  // Variables to store audio players and their states
   let player1 = null;
+  let player2 = null;
   let isPlaying1 = false;
+  let isPlaying2 = false;
 
-  // Load Audio
+  // Load Audio File for Player
   function loadAudio(playerNumber) {
     const fileInput = document.getElementById(`audioFile${playerNumber}`);
     const file = fileInput.files[0];
     if (!file) return;
 
     const audioUrl = URL.createObjectURL(file);
+    
     if (playerNumber === 1) {
+      // Stop and reset player if already loaded
+      if (player1) player1.pause();
       player1 = new Audio(audioUrl);
       player1.volume = document.getElementById(`volumeSlider1`).value;
-    }
-  }
-
-  // Toggle Play/Pause
-  function togglePlayPause(playerNumber) {
-    const player = player1;
-    if (!player) return;
-
-    if (isPlaying1) {
-      player.pause();
-      document.getElementById(`playPauseBtn1`).textContent = 'Play';
       isPlaying1 = false;
-    } else {
-      player.play();
-      document.getElementById(`playPauseBtn1`).textContent = 'Pause';
-      isPlaying1 = true;
+      document.getElementById("playPauseBtn1").textContent = "Play";
+    } else if (playerNumber === 2) {
+      // Stop and reset player if already loaded
+      if (player2) player2.pause();
+      player2 = new Audio(audioUrl);
+      player2.volume = document.getElementById(`volumeSlider2`).value;
+      isPlaying2 = false;
+      document.getElementById("playPauseBtn2").textContent = "Play";
     }
   }
 
-  // Set Volume
+  // Toggle Play/Pause for Audio Player
+  function togglePlayPause(playerNumber) {
+    if (playerNumber === 1 && player1) {
+      if (isPlaying1) {
+        player1.pause();
+        document.getElementById("playPauseBtn1").textContent = "Play";
+      } else {
+        player1.play();
+        document.getElementById("playPauseBtn1").textContent = "Pause";
+      }
+      isPlaying1 = !isPlaying1;
+    } else if (playerNumber === 2 && player2) {
+      if (isPlaying2) {
+        player2.pause();
+        document.getElementById("playPauseBtn2").textContent = "Play";
+      } else {
+        player2.play();
+        document.getElementById("playPauseBtn2").textContent = "Pause";
+      }
+      isPlaying2 = !isPlaying2;
+    }
+  }
+
+  // Set Volume for Audio Player
   function setVolume(playerNumber) {
     if (playerNumber === 1 && player1) {
-      const volume = document.getElementById(`volumeSlider1`).value;
+      const volume = document.getElementById("volumeSlider1").value;
       player1.volume = volume;
+    } else if (playerNumber === 2 && player2) {
+      const volume = document.getElementById("volumeSlider2").value;
+      player2.volume = volume;
     }
   }
 </script>
