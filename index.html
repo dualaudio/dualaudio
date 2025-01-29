@@ -192,6 +192,26 @@
       gainNode2.gain.value = volume;
     }
   }
+
+  document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') {
+    // When the page becomes visible (e.g., tab switches back), resume audio
+    if (isPlaying1) {
+      player1.play();
+    }
+    if (isPlaying2) {
+      player2.play();
+    }
+  } else {
+    // When the page is hidden (e.g., tab switches away), pause audio to save resources
+    if (isPlaying1) {
+      player1.pause();
+    }
+    if (isPlaying2) {
+      player2.pause();
+    }
+  }
+});
 </script>
 
 </body>
