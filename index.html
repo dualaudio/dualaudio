@@ -134,6 +134,17 @@
   let isPlaying1 = false;
   let isPlaying2 = false;
 
+  // Add a gesture listener for background audio playback on mobile devices
+  document.body.addEventListener('click', () => {
+    // This is required to resume the AudioContext on mobile devices for background audio to play
+    if (audioContext1.state === 'suspended') {
+      audioContext1.resume();
+    }
+    if (audioContext2.state === 'suspended') {
+      audioContext2.resume();
+    }
+  });
+
   function loadAudio(playerNumber) {
     const fileInput = document.getElementById(`audioFile${playerNumber}`);
     const file = fileInput.files[0];
@@ -165,7 +176,7 @@
         document.getElementById("playPauseBtn1").textContent = "Play";
       } else {
         player1.play();
-        audioContext1.resume();
+        audioContext1.resume(); // Make sure the audio context is resumed
         document.getElementById("playPauseBtn1").textContent = "Pause";
       }
       isPlaying1 = !isPlaying1;
@@ -175,7 +186,7 @@
         document.getElementById("playPauseBtn2").textContent = "Play";
       } else {
         player2.play();
-        audioContext2.resume();
+        audioContext2.resume(); // Make sure the audio context is resumed
         document.getElementById("playPauseBtn2").textContent = "Pause";
       }
       isPlaying2 = !isPlaying2;
