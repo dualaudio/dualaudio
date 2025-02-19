@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Audio Player with Gain Control</title>
   <style>
+    /* Basic styling for the player */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-      background: rgba(0, 0, 0, 0.5); /* Dark, semi-transparent background */
+      background: rgba(0, 0, 0, 0.5);
       color: white;
       margin: 0;
       padding: 0;
@@ -16,7 +16,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      backdrop-filter: blur(10px); /* iOS style blur effect */
+      backdrop-filter: blur(10px);
     }
 
     h1 {
@@ -27,7 +27,7 @@
     }
 
     .player-container {
-      background: rgba(0, 0, 0, 0.7); /* Slightly lighter background to contrast with blur */
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 20px;
       padding: 20px;
       width: 90%;
@@ -124,22 +124,22 @@
 </div>
 
 <script>
-  // Create the AudioContext and GainNode for both players
-const audioContext1 = new (window.AudioContext || window.webkitAudioContext)();
-const gainNode1 = audioContext1.createGain();
-gainNode1.connect(audioContext1.destination);
+  let player1 = document.getElementById("audioPlayer1");
+  let player2 = document.getElementById("audioPlayer2");
+  let isPlaying1 = false;
+  let isPlaying2 = false;
 
-const audioContext2 = new (window.AudioContext || window.webkitAudioContext)();
-const gainNode2 = audioContext2.createGain();
-gainNode2.connect(audioContext2.destination);
+  // Create AudioContext for background play
+  const audioContext1 = new (window.AudioContext || window.webkitAudioContext)();
+  const gainNode1 = audioContext1.createGain();
+  gainNode1.connect(audioContext1.destination);
 
-let player1 = document.getElementById("audioPlayer1");
-let player2 = document.getElementById("audioPlayer2");
-let isPlaying1 = false;
-let isPlaying2 = false;
+  const audioContext2 = new (window.AudioContext || window.webkitAudioContext)();
+  const gainNode2 = audioContext2.createGain();
+  gainNode2.connect(audioContext2.destination);
 
-// Function to load audio files
-function loadAudio(playerNumber) {
+  // Function to load audio
+  function loadAudio(playerNumber) {
     const fileInput = document.getElementById(`audioFile${playerNumber}`);
     const file = fileInput.files[0];
     if (!file) return;
@@ -147,64 +147,64 @@ function loadAudio(playerNumber) {
     const audioUrl = URL.createObjectURL(file);
 
     if (playerNumber === 1) {
-        player1.src = audioUrl;
-        const track1 = audioContext1.createMediaElementSource(player1);
-        track1.connect(gainNode1);
-        player1.play();
-        isPlaying1 = true;
-        document.getElementById("playPauseBtn1").textContent = "Pause";
+      player1.src = audioUrl;
+      const track1 = audioContext1.createMediaElementSource(player1);
+      track1.connect(gainNode1);
+      player1.play();
+      isPlaying1 = true;
+      document.getElementById("playPauseBtn1").textContent = "Pause";
     } else if (playerNumber === 2) {
-        player2.src = audioUrl;
-        const track2 = audioContext2.createMediaElementSource(player2);
-        track2.connect(gainNode2);
-        player2.play();
-        isPlaying2 = true;
-        document.getElementById("playPauseBtn2").textContent = "Pause";
+      player2.src = audioUrl;
+      const track2 = audioContext2.createMediaElementSource(player2);
+      track2.connect(gainNode2);
+      player2.play();
+      isPlaying2 = true;
+      document.getElementById("playPauseBtn2").textContent = "Pause";
     }
-}
+  }
 
-// Function to toggle play/pause
-function togglePlayPause(playerNumber) {
+  // Toggle play/pause
+  function togglePlayPause(playerNumber) {
     if (playerNumber === 1) {
-        if (isPlaying1) {
-            player1.pause();
-            document.getElementById("playPauseBtn1").textContent = "Play";
-        } else {
-            player1.play();
-            document.getElementById("playPauseBtn1").textContent = "Pause";
-        }
-        isPlaying1 = !isPlaying1;
+      if (isPlaying1) {
+        player1.pause();
+        document.getElementById("playPauseBtn1").textContent = "Play";
+      } else {
+        player1.play();
+        document.getElementById("playPauseBtn1").textContent = "Pause";
+      }
+      isPlaying1 = !isPlaying1;
     } else if (playerNumber === 2) {
-        if (isPlaying2) {
-            player2.pause();
-            document.getElementById("playPauseBtn2").textContent = "Play";
-        } else {
-            player2.play();
-            document.getElementById("playPauseBtn2").textContent = "Pause";
-        }
-        isPlaying2 = !isPlaying2;
+      if (isPlaying2) {
+        player2.pause();
+        document.getElementById("playPauseBtn2").textContent = "Play";
+      } else {
+        player2.play();
+        document.getElementById("playPauseBtn2").textContent = "Pause";
+      }
+      isPlaying2 = !isPlaying2;
     }
-}
+  }
 
-// Function to set volume using GainNode
-function setVolume(playerNumber) {
+  // Set volume
+  function setVolume(playerNumber) {
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
     if (playerNumber === 1) {
-        gainNode1.gain.value = volume;
+      gainNode1.gain.value = volume;
     } else if (playerNumber === 2) {
-        gainNode2.gain.value = volume;
+      gainNode2.gain.value = volume;
     }
-}
+  }
 
-// Keep audio playing in the background
-document.addEventListener('touchstart', function() {
-    if (!audioContext1.state === 'running') {
-        audioContext1.resume();
+  // Add a listener to resume the AudioContext on user interaction
+  document.addEventListener('touchstart', function() {
+    if (audioContext1.state === 'suspended') {
+      audioContext1.resume();
     }
-    if (!audioContext2.state === 'running') {
-        audioContext2.resume();
+    if (audioContext2.state === 'suspended') {
+      audioContext2.resume();
     }
-});
+  });
 </script>
 
 </body>
