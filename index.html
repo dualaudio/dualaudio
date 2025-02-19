@@ -123,6 +123,14 @@
 </div>
 
 <script>
+  const audioContext1 = new (window.AudioContext || window.webkitAudioContext)();
+  const gainNode1 = audioContext1.createGain();
+  gainNode1.connect(audioContext1.destination);
+
+  const audioContext2 = new (window.AudioContext || window.webkitAudioContext)();
+  const gainNode2 = audioContext2.createGain();
+  gainNode2.connect(audioContext2.destination);
+
   let player1 = document.getElementById("audioPlayer1");
   let player2 = document.getElementById("audioPlayer2");
   let isPlaying1 = false;
@@ -138,11 +146,15 @@
     if (playerNumber === 1) {
       player1.src = audioUrl;
       player1.play();
+      const track1 = audioContext1.createMediaElementSource(player1);
+      track1.connect(gainNode1);
       isPlaying1 = true;
       document.getElementById("playPauseBtn1").textContent = "Pause";
     } else if (playerNumber === 2) {
       player2.src = audioUrl;
       player2.play();
+      const track2 = audioContext2.createMediaElementSource(player2);
+      track2.connect(gainNode2);
       isPlaying2 = true;
       document.getElementById("playPauseBtn2").textContent = "Pause";
     }
@@ -170,10 +182,6 @@
     }
   }
 
-  
-  
-  
-  // Set volume using the GainNode instead of the <audio> element
   function setVolume(playerNumber) {
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
     if (playerNumber === 1) {
@@ -182,12 +190,6 @@
       gainNode2.gain.value = volume;
     }
   }
-
-  // Keep audio playing on background with the "autoplay" and "playsinline" attributes
-  document.addEventListener('touchstart', function() {
-    player1.play();
-    player2.play();
-  });
 </script>
 
 </body>
