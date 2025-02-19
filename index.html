@@ -128,8 +128,6 @@
   let player2 = document.getElementById("audioPlayer2");
   let isPlaying1 = false;
   let isPlaying2 = false;
-  
-  let audioInitialized = false; // Flag to track if audio has been initialized
 
   function loadAudio(playerNumber) {
     const fileInput = document.getElementById(`audioFile${playerNumber}`);
@@ -182,50 +180,13 @@
     }
   }
   
-  function initializeAudio() {
-        if (!audioInitialized) {
-            player1.play().catch(error => console.error("Player 1 play error:", error)); // Handle potential play errors
-            player2.play().catch(error => console.error("Player 2 play error:", error));
-            audioInitialized = true;
-
-            // Optional: Pause immediately after starting, if you want the user to explicitly press play.
-            player1.pause();
-            player2.pause();
-            document.getElementById("playPauseBtn1").textContent = "Play";
-            document.getElementById("playPauseBtn2").textContent = "Play";
-            isPlaying1 = false;
-            isPlaying2 = false;
-
-            // Remove the event listeners after initialization to prevent it from firing again.
-            document.removeEventListener('touchstart', initializeAudio);
-            document.removeEventListener('click', initializeAudio); // Add click for desktop/other devices
-        }
-    }
-  
-  document.addEventListener('touchstart', initializeAudio);
-    document.addEventListener('click', initializeAudio); // Add click for desktop/other devices
 
 
-    // Add event listeners for 'play' and 'pause' to update button text and isPlaying status
-    player1.addEventListener('play', () => {
-        isPlaying1 = true;
-        document.getElementById("playPauseBtn1").textContent = "Pause";
-    });
-
-    player1.addEventListener('pause', () => {
-        isPlaying1 = false;
-        document.getElementById("playPauseBtn1").textContent = "Play";
-    });
-
-    player2.addEventListener('play', () => {
-        isPlaying2 = true;
-        document.getElementById("playPauseBtn2").textContent = "Pause";
-    });
-
-    player2.addEventListener('pause', () => {
-        isPlaying2 = false;
-        document.getElementById("playPauseBtn2").textContent = "Play";
-    });
+  // Keep audio playing on background with the "autoplay" and "playsinline" attributes
+  document.addEventListener('touchstart', function() {
+    player1.play();
+    player2.play();
+  });
 </script>
 
 </body>
