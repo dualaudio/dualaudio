@@ -178,6 +178,10 @@
       player2.volume = volume;
     }
   }
+  
+  document.getElementById("volumeSlider1").value = player1.volume;
+  document.getElementById("volumeSlider2").value = player2.volume;
+
 
   // Keep audio playing on background with the "autoplay" and "playsinline" attributes
   document.addEventListener('touchstart', function() {
