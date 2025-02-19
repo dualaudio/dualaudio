@@ -170,15 +170,26 @@
       isPlaying2 = !isPlaying2;
     }
   }
-
+  
   function setVolume(playerNumber) {
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
+    console.log(`Volume for player ${playerNumber}: ${volume}`); // Check the value
     if (playerNumber === 1) {
-      player1.volume = volume;
+        player1.volume = volume;
     } else if (playerNumber === 2) {
-      player2.volume = volume;
+        player2.volume = volume;
     }
-  }
+}
+
+  //function setVolume(playerNumber) {
+    //const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
+    //if (playerNumber === 1) {
+      //player1.volume = volume;
+   // } else if (playerNumber === 2) {
+      //player2.volume = volume;
+    //}
+ // }
+
   
 
 
