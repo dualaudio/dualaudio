@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Audio Player with Gain Control</title>
-  <style>
+   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
       background: rgba(0, 0, 0, 0.5); /* Dark, semi-transparent background */
@@ -99,7 +99,7 @@
     <div class="file-input">
       <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile1" onchange="loadAudio(1)">
     </div>
-    <audio id="audioPlayer1" controls></audio>
+    <audio id="audioPlayer1" controls playsinline></audio>
     <button onclick="togglePlayPause(1)" class="play-button" id="playPauseBtn1">Play</button>
     <div class="volume-slider">
       <input type="range" id="volumeSlider1" min="0" max="1" step="0.025" value="0.5" onchange="setVolume(1)">
@@ -113,7 +113,7 @@
     <div class="file-input">
       <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile2" onchange="loadAudio(2)">
     </div>
-    <audio id="audioPlayer2" controls></audio>
+    <audio id="audioPlayer2" controls playsinline></audio>
     <button onclick="togglePlayPause(2)" class="play-button" id="playPauseBtn2">Play</button>
     <div class="volume-slider">
       <input type="range" id="volumeSlider2" min="0" max="1" step="0.025" value="0.5" onchange="setVolume(2)">
@@ -123,15 +123,6 @@
 </div>
 
 <script>
-  // Create the AudioContext and GainNode for both players
-  const audioContext1 = new (window.AudioContext || window.webkitAudioContext)();
-  const gainNode1 = audioContext1.createGain();
-  gainNode1.connect(audioContext1.destination);
-
-  const audioContext2 = new (window.AudioContext || window.webkitAudioContext)();
-  const gainNode2 = audioContext2.createGain();
-  gainNode2.connect(audioContext2.destination);
-
   let player1 = document.getElementById("audioPlayer1");
   let player2 = document.getElementById("audioPlayer2");
   let isPlaying1 = false;
@@ -147,15 +138,11 @@
     if (playerNumber === 1) {
       player1.src = audioUrl;
       player1.play();
-      const track1 = audioContext1.createMediaElementSource(player1);
-      track1.connect(gainNode1);
       isPlaying1 = true;
       document.getElementById("playPauseBtn1").textContent = "Pause";
     } else if (playerNumber === 2) {
       player2.src = audioUrl;
       player2.play();
-      const track2 = audioContext2.createMediaElementSource(player2);
-      track2.connect(gainNode2);
       isPlaying2 = true;
       document.getElementById("playPauseBtn2").textContent = "Pause";
     }
@@ -183,17 +170,20 @@
     }
   }
 
-  // Set volume using the GainNode instead of the <audio> element
   function setVolume(playerNumber) {
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
     if (playerNumber === 1) {
-      gainNode1.gain.value = volume;
+      player1.volume = volume;
     } else if (playerNumber === 2) {
-      gainNode2.gain.value = volume;
+      player2.volume = volume;
     }
   }
 
-
+  // Keep audio playing on background with the "autoplay" and "playsinline" attributes
+  document.addEventListener('touchstart', function() {
+    player1.play();
+    player2.play();
+  });
 </script>
 
 </body>
