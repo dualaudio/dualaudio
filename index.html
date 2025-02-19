@@ -125,79 +125,66 @@
 
 <script>
   let player1 = document.getElementById("audioPlayer1");
-  let player2 = document.getElementById("audioPlayer2");
-  let isPlaying1 = false;
-  let isPlaying2 = false;
+let player2 = document.getElementById("audioPlayer2");
+let isPlaying1 = false;
+let isPlaying2 = false;
 
-  function loadAudio(playerNumber) {
+function loadAudio(playerNumber) {
     const fileInput = document.getElementById(`audioFile${playerNumber}`);
     const file = fileInput.files[0];
     if (!file) return;
 
     const audioUrl = URL.createObjectURL(file);
-    
-    if (playerNumber === 1) {
-      player1.src = audioUrl;
-      player1.play();
-      isPlaying1 = true;
-      document.getElementById("playPauseBtn1").textContent = "Pause";
-    } else if (playerNumber === 2) {
-      player2.src = audioUrl;
-      player2.play();
-      isPlaying2 = true;
-      document.getElementById("playPauseBtn2").textContent = "Pause";
-    }
-  }
 
-  function togglePlayPause(playerNumber) {
     if (playerNumber === 1) {
-      if (isPlaying1) {
-        player1.pause();
-        document.getElementById("playPauseBtn1").textContent = "Play";
-      } else {
+        player1.src = audioUrl;
         player1.play();
+        isPlaying1 = true;
         document.getElementById("playPauseBtn1").textContent = "Pause";
-      }
-      isPlaying1 = !isPlaying1;
     } else if (playerNumber === 2) {
-      if (isPlaying2) {
-        player2.pause();
-        document.getElementById("playPauseBtn2").textContent = "Play";
-      } else {
+        player2.src = audioUrl;
         player2.play();
+        isPlaying2 = true;
         document.getElementById("playPauseBtn2").textContent = "Pause";
-      }
-      isPlaying2 = !isPlaying2;
-    }
-  }
-  
-  function setVolume(playerNumber) {
-    const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
-    console.log(`Volume for player ${playerNumber}: ${volume}`); // Check the value
-    if (playerNumber === 1) {
-        player1.volume = volume;
-    } else if (playerNumber === 2) {
-        player2.volume = volume;
     }
 }
 
-  //function setVolume(playerNumber) {
-    //const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
-    //if (playerNumber === 1) {
-      //player1.volume = volume;
-   // } else if (playerNumber === 2) {
-      //player2.volume = volume;
-    //}
- // }
+function togglePlayPause(playerNumber) {
+    if (playerNumber === 1) {
+        if (isPlaying1) {
+            player1.pause();
+            document.getElementById("playPauseBtn1").textContent = "Play";
+        } else {
+            player1.play();
+            document.getElementById("playPauseBtn1").textContent = "Pause";
+        }
+        isPlaying1 = !isPlaying1;
+    } else if (playerNumber === 2) {
+        if (isPlaying2) {
+            player2.pause();
+            document.getElementById("playPauseBtn2").textContent = "Play";
+        } else {
+            player2.play();
+            document.getElementById("playPauseBtn2").textContent = "Pause";
+        }
+        isPlaying2 = !isPlaying2;
+    }
+}
 
-  
+function setVolume(playerNumber) {
+    const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
+    if (playerNumber === 1) {
+        player1.volume = volume;  // Control volume directly for player1
+    } else if (playerNumber === 2) {
+        player2.volume = volume;  // Control volume directly for player2
+    }
+}
 
-
-  // Keep audio playing on background with the "autoplay" and "playsinline" attributes
-  document.addEventListener('touchstart', function() {
+// Keep audio playing on background with the "autoplay" and "playsinline" attributes
+document.addEventListener('touchstart', function() {
     player1.play();
     player2.play();
-  });
+});
 </script>
 
 </body>
