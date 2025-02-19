@@ -127,6 +127,9 @@
   let player2 = document.getElementById("audioPlayer2");
   let isPlaying1 = false;
   let isPlaying2 = false;
+  let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  let gainNode1, gainNode2;
+  let source1, source2;
 
   function loadAudio(playerNumber) {
     const fileInput = document.getElementById(`audioFile${playerNumber}`);
@@ -134,17 +137,33 @@
     if (!file) return;
 
     const audioUrl = URL.createObjectURL(file);
-    
+
     if (playerNumber === 1) {
       player1.src = audioUrl;
-      player1.play();
+      setupAudioContext(1, audioUrl);
       isPlaying1 = true;
       document.getElementById("playPauseBtn1").textContent = "Pause";
     } else if (playerNumber === 2) {
       player2.src = audioUrl;
-      player2.play();
+      setupAudioContext(2, audioUrl);
       isPlaying2 = true;
       document.getElementById("playPauseBtn2").textContent = "Pause";
+    }
+  }
+
+  function setupAudioContext(playerNumber, audioUrl) {
+    const audioElement = playerNumber === 1 ? player1 : player2;
+    const audioSource = audioContext.createMediaElementSource(audioElement);
+    const gainNode = audioContext.createGain();
+    audioSource.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    if (playerNumber === 1) {
+      gainNode1 = gainNode;
+      source1 = audioSource;
+    } else {
+      gainNode2 = gainNode;
+      source2 = audioSource;
     }
   }
 
@@ -173,16 +192,14 @@
   function setVolume(playerNumber) {
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
     if (playerNumber === 1) {
-      player1.volume = volume;
+      gainNode1.gain.value = volume;
     } else if (playerNumber === 2) {
-      player2.volume = volume;
+      gainNode2.gain.value = volume;
     }
   }
-  
 
-
-  // Keep audio playing on background with the "autoplay" and "playsinline" attributes
-  document.addEventListener('touchstart', function() {
+  // Ensure background audio play works
+  document.addEventListener('touchstart', function () {
     player1.play();
     player2.play();
   });
