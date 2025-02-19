@@ -172,6 +172,7 @@
 
   function setVolume(playerNumber) {
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
+    console.log(`Setting volume for Player ${playerNumber} to: ${volume}`);  // Debugging line
     if (playerNumber === 1) {
       player1.volume = volume;
     } else if (playerNumber === 2) {
