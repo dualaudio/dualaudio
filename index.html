@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,7 +103,7 @@
     <audio id="audioPlayer1" controls playsinline></audio>
     <button onclick="togglePlayPause(1)" class="play-button" id="playPauseBtn1">Play</button>
     <div class="volume-slider">
-      <input type="range" id="volumeSlider1" min="0" max="1" step="0.025" value="0.5" oninput="setVolume(1)">
+      <input type="range" id="volumeSlider1" min="0" max="1" step="0.025" value="0.5" onchange="setVolume(1)">
       <label for="volumeSlider1">Volume</label>
     </div>
   </div>
@@ -116,7 +117,7 @@
     <audio id="audioPlayer2" controls playsinline></audio>
     <button onclick="togglePlayPause(2)" class="play-button" id="playPauseBtn2">Play</button>
     <div class="volume-slider">
-      <input type="range" id="volumeSlider2" min="0" max="1" step="0.025" value="0.5" oninput="setVolume(2)">
+      <input type="range" id="volumeSlider2" min="0" max="1" step="0.025" value="0.5" onchange="setVolume(2)">
       <label for="volumeSlider2">Volume</label>
     </div>
   </div>
@@ -127,6 +128,8 @@
   let player2 = document.getElementById("audioPlayer2");
   let isPlaying1 = false;
   let isPlaying2 = false;
+  
+  let audioInitialized = false; // Flag to track if audio has been initialized
 
   function loadAudio(playerNumber) {
     const fileInput = document.getElementById(`audioFile${playerNumber}`);
@@ -172,13 +175,57 @@
 
   function setVolume(playerNumber) {
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
-    console.log(`Setting volume for Player ${playerNumber} to: ${volume}`);  // Debugging line
     if (playerNumber === 1) {
       player1.volume = volume;
     } else if (playerNumber === 2) {
       player2.volume = volume;
     }
   }
+  
+  function initializeAudio() {
+        if (!audioInitialized) {
+            player1.play().catch(error => console.error("Player 1 play error:", error)); // Handle potential play errors
+            player2.play().catch(error => console.error("Player 2 play error:", error));
+            audioInitialized = true;
+
+            // Optional: Pause immediately after starting, if you want the user to explicitly press play.
+            player1.pause();
+            player2.pause();
+            document.getElementById("playPauseBtn1").textContent = "Play";
+            document.getElementById("playPauseBtn2").textContent = "Play";
+            isPlaying1 = false;
+            isPlaying2 = false;
+
+            // Remove the event listeners after initialization to prevent it from firing again.
+            document.removeEventListener('touchstart', initializeAudio);
+            document.removeEventListener('click', initializeAudio); // Add click for desktop/other devices
+        }
+    }
+  
+  document.addEventListener('touchstart', initializeAudio);
+    document.addEventListener('click', initializeAudio); // Add click for desktop/other devices
+
+
+    // Add event listeners for 'play' and 'pause' to update button text and isPlaying status
+    player1.addEventListener('play', () => {
+        isPlaying1 = true;
+        document.getElementById("playPauseBtn1").textContent = "Pause";
+    });
+
+    player1.addEventListener('pause', () => {
+        isPlaying1 = false;
+        document.getElementById("playPauseBtn1").textContent = "Play";
+    });
+
+    player2.addEventListener('play', () => {
+        isPlaying2 = true;
+        document.getElementById("playPauseBtn2").textContent = "Pause";
+    });
+
+    player2.addEventListener('pause', () => {
+        isPlaying2 = false;
+        document.getElementById("playPauseBtn2").textContent = "Play";
+    });
 </script>
 
 </body>
