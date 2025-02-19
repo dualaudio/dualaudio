@@ -170,12 +170,16 @@
     }
   }
 
+  
+  
+  
+  // Set volume using the GainNode instead of the <audio> element
   function setVolume(playerNumber) {
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
     if (playerNumber === 1) {
-      player1.volume = volume;
+      gainNode1.gain.value = volume;
     } else if (playerNumber === 2) {
-      player2.volume = volume;
+      gainNode2.gain.value = volume;
     }
   }
 
