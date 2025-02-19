@@ -148,16 +148,16 @@ function loadAudio(playerNumber) {
 
     if (playerNumber === 1) {
         player1.src = audioUrl;
-        player1.play();
         const track1 = audioContext1.createMediaElementSource(player1);
         track1.connect(gainNode1);
+        player1.play();
         isPlaying1 = true;
         document.getElementById("playPauseBtn1").textContent = "Pause";
     } else if (playerNumber === 2) {
         player2.src = audioUrl;
-        player2.play();
         const track2 = audioContext2.createMediaElementSource(player2);
         track2.connect(gainNode2);
+        player2.play();
         isPlaying2 = true;
         document.getElementById("playPauseBtn2").textContent = "Pause";
     }
@@ -196,10 +196,14 @@ function setVolume(playerNumber) {
     }
 }
 
-// Keep audio playing on background with the "autoplay" and "playsinline" attributes
+// Keep audio playing in the background
 document.addEventListener('touchstart', function() {
-    player1.play();
-    player2.play();
+    if (!audioContext1.state === 'running') {
+        audioContext1.resume();
+    }
+    if (!audioContext2.state === 'running') {
+        audioContext2.resume();
+    }
 });
 </script>
 
