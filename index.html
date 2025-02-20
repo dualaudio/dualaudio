@@ -199,12 +199,20 @@
 
   function loadYouTube() {
     let url = document.getElementById("youtubeURL").value;
-    let videoId = url.split("v=")[1]?.split("&")[0] || "";
-    if (videoId) {
-      document.getElementById("youtubePlayer").src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
-      setTimeout(initYouTubeAPI, 1000);
+    let videoId = "";
+
+    // Extract video ID from both standard and short YouTube links
+    if (url.includes("youtube.com/watch?v=")) {
+        videoId = url.split("v=")[1]?.split("&")[0];
+    } else if (url.includes("youtu.be/")) {
+        videoId = url.split("youtu.be/")[1]?.split("?")[0];
     }
-  }
+
+    if (videoId) {
+        document.getElementById("youtubePlayer").src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+        setTimeout(initYouTubeAPI, 1000);
+    }
+}
 
   function initYouTubeAPI() {
     ytPlayer = new YT.Player('youtubePlayer', {
