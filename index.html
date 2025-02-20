@@ -3,64 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual Audio Player</title>
+  <title>Audio Player with Streaming</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-      background: rgba(0, 0, 0, 0.5); /* Dark, semi-transparent background */
+      background: rgba(0, 0, 0, 0.5);
       color: white;
       margin: 0;
       padding: 0;
       height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      backdrop-filter: blur(10px); /* iOS style blur effect */
+      justify-content: center;
+      backdrop-filter: blur(10px);
     }
 
     h1 {
-      font-size: 32px;
-      margin-bottom: 20px;
+      font-size: 28px;
       text-align: center;
-      font-weight: 700;
     }
 
-    .player-container {
-      background: rgba(0, 0, 0, 0.7); /* Slightly lighter background to contrast with blur */
-      border-radius: 20px;
-      padding: 20px;
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      background: #007AFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin: 0 5px;
+      transition: background 0.3s ease;
+    }
+
+    .tab.active {
+      background: #005BB5;
+    }
+
+    .tab-content {
+      display: none;
       width: 90%;
       max-width: 400px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 12px;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     }
 
-    .player-container h2 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      text-align: center;
+    .tab-content.active {
+      display: block;
+    }
+
+    .player-container {
+      margin-bottom: 20px;
     }
 
     .file-input, .volume-slider {
       width: 100%;
-      margin-bottom: 20px;
-    }
-
-    .file-input input, .volume-slider input {
-      width: 100%;
-      background-color: transparent;
-      border: none;
-      border-radius: 10px;
-      height: 40px;
-      color: white;
-      font-size: 16px;
-    }
-
-    .file-input input[type="file"] {
-      color: white;
-    }
-
-    .volume-slider {
-      margin-top: 10px;
+      margin-bottom: 10px;
     }
 
     .play-button {
@@ -68,58 +74,61 @@
       background-color: #007AFF;
       color: white;
       padding: 10px;
-      font-size: 18px;
+      font-size: 16px;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      text-align: center;
-      transition: background-color 0.3s ease;
+      transition: background 0.3s ease;
     }
 
     .play-button:hover {
       background-color: #005BB5;
     }
 
-    label {
-      font-size: 14px;
-      display: block;
-      margin-top: 10px;
-      text-align: center;
+    iframe {
+      width: 100%;
+      height: 200px;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
 
-<div class="player-container">
-  <h1>Audio Player</h1>
+<h1>Audio Player & YouTube Stream</h1>
 
-  <!-- Player 1 -->
-  <div>
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('local')">Local</button>
+  <button class="tab" onclick="showTab('stream')">Stream</button>
+</div>
+
+<!-- Local Tab -->
+<div id="local" class="tab-content active">
+  <div class="player-container">
     <h2>Player 1</h2>
-    <div class="file-input">
-      <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile1" onchange="loadAudio(1)">
-    </div>
+    <input type="file" accept="audio/*" id="audioFile1" onchange="loadAudio(1)">
     <audio id="audioPlayer1" controls playsinline></audio>
     <button onclick="togglePlayPause(1)" class="play-button" id="playPauseBtn1">Play</button>
-    <div class="volume-slider">
-      <input type="range" id="volumeSlider1" min="0" max="1" step="0.025" value="0.5" onchange="setVolume(1)">
-      <label for="volumeSlider1">Volume</label>
-    </div>
+    <input type="range" id="volumeSlider1" min="0" max="1" step="0.025" value="0.5" onchange="setVolume(1)">
   </div>
 
-  <div style="margin-top: 40px;">
-    <!-- Player 2 -->
+  <div class="player-container">
     <h2>Player 2</h2>
-    <div class="file-input">
-      <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile2" onchange="loadAudio(2)">
-    </div>
+    <input type="file" accept="audio/*" id="audioFile2" onchange="loadAudio(2)">
     <audio id="audioPlayer2" controls playsinline></audio>
     <button onclick="togglePlayPause(2)" class="play-button" id="playPauseBtn2">Play</button>
-    <div class="volume-slider">
-      <input type="range" id="volumeSlider2" min="0" max="1" step="0.025" value="0.5" onchange="setVolume(2)">
-      <label for="volumeSlider2">Volume</label>
-    </div>
+    <input type="range" id="volumeSlider2" min="0" max="1" step="0.025" value="0.5" onchange="setVolume(2)">
   </div>
+</div>
+
+<!-- Stream Tab -->
+<div id="stream" class="tab-content">
+  <h2>YouTube Stream</h2>
+  <input type="text" id="youtubeURL" placeholder="Enter YouTube URL">
+  <button class="play-button" onclick="loadYouTube()">Load Video</button>
+  <br><br>
+  <iframe id="youtubePlayer" src="" allowfullscreen></iframe>
+  <input type="range" id="youtubeVolume" min="0" max="100" step="5" value="50" onchange="setYouTubeVolume()">
 </div>
 
 <script>
@@ -127,6 +136,15 @@
   let player2 = document.getElementById("audioPlayer2");
   let isPlaying1 = false;
   let isPlaying2 = false;
+  let ytPlayer;
+
+  function showTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+
+    document.getElementById(tabName).classList.add('active');
+    document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
+  }
 
   function loadAudio(playerNumber) {
     const fileInput = document.getElementById(`audioFile${playerNumber}`);
@@ -140,7 +158,7 @@
       player1.play();
       isPlaying1 = true;
       document.getElementById("playPauseBtn1").textContent = "Pause";
-    } else if (playerNumber === 2) {
+    } else {
       player2.src = audioUrl;
       player2.play();
       isPlaying2 = true;
@@ -158,7 +176,7 @@
         document.getElementById("playPauseBtn1").textContent = "Pause";
       }
       isPlaying1 = !isPlaying1;
-    } else if (playerNumber === 2) {
+    } else {
       if (isPlaying2) {
         player2.pause();
         document.getElementById("playPauseBtn2").textContent = "Play";
@@ -174,18 +192,41 @@
     const volume = parseFloat(document.getElementById(`volumeSlider${playerNumber}`).value);
     if (playerNumber === 1) {
       player1.volume = volume;
-    } else if (playerNumber === 2) {
+    } else {
       player2.volume = volume;
     }
   }
-  
 
+  function loadYouTube() {
+    let url = document.getElementById("youtubeURL").value;
+    let videoId = url.split("v=")[1]?.split("&")[0] || "";
+    if (videoId) {
+      document.getElementById("youtubePlayer").src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+      setTimeout(initYouTubeAPI, 1000);
+    }
+  }
 
-  // Keep audio playing on background with the "autoplay" and "playsinline" attributes
-  document.addEventListener('touchstart', function() {
-    player1.play();
-    player2.play();
-  });
+  function initYouTubeAPI() {
+    ytPlayer = new YT.Player('youtubePlayer', {
+      events: {
+        'onReady': function(event) {
+          event.target.setVolume(document.getElementById("youtubeVolume").value);
+        }
+      }
+    });
+  }
+
+  function setYouTubeVolume() {
+    if (ytPlayer) {
+      ytPlayer.setVolume(document.getElementById("youtubeVolume").value);
+    }
+  }
+
+  function onYouTubeIframeAPIReady() {}
+
+  let script = document.createElement('script');
+  script.src = "https://www.youtube.com/iframe_api";
+  document.body.appendChild(script);
 </script>
 
 </body>
